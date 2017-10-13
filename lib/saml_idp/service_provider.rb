@@ -50,6 +50,10 @@ module SamlIdp
       persisted = metadata_getter[identifier, self]
       if persisted.is_a? Hash
         PersistedMetadata.new(persisted)
+      elsif persisted.nil?
+        fresh = fresh_incoming_metadata
+        metadata_persister[identifier, fresh]
+        PersistedMetadata.new fresh.to_h
       end
     end
     private :get_current_or_build
@@ -70,7 +74,7 @@ module SamlIdp
     private :fresh_incoming_metadata
 
     def request_metadata
-      metadata_url.present? ? Net::HTTP.get(URI.parse(metadata_url)) : ""
+      metadata_url.present? ? Net::HTTP.get(URI.parse(metadata_url)) : ''
     end
     private :request_metadata
   end
